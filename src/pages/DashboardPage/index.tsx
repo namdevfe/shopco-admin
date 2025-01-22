@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button'
 
-const HomePage = () => {
+const DashboardPage = () => {
   return (
     <div>
       <Button>Text</Button>
@@ -10,4 +10,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default DashboardPage
