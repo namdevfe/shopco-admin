@@ -1,61 +1,82 @@
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import { useForm } from 'react-hook-form'
+import Typography from '@mui/material/Typography'
 import { Link } from 'react-router-dom'
 import InputField from '~/components/InputField'
-import { LoginPayLoad } from '~/types/auth'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import { RegisterPayload } from '~/types/auth'
 import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useState } from 'react'
 import { IconButton, InputAdornment } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
-import { useState } from 'react'
 
-interface LoginFormProps {
+interface RegisterFormProps {
   loading?: boolean
   // eslint-disable-next-line no-unused-vars
-  onSubmit?: (payload: LoginPayLoad) => void
+  onSubmit?: (payload: RegisterPayload) => void
 }
 
-const LoginForm = ({ loading = false, onSubmit }: LoginFormProps) => {
+const RegisterForm = ({ loading = false, onSubmit }: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const schema = yup.object().shape({
-    email: yup.string().required('Email is required').email('Email invalid'),
+    lastName: yup.string().required('Last name is required'),
+    firstName: yup.string().required('First name is required'),
+    email: yup
+      .string()
+      .required('Email is required')
+      .email('Email is not correct format'),
     password: yup
       .string()
       .required('Password is required')
       .min(6, 'Password must have least 6 characters')
   })
 
-  const { control, handleSubmit } = useForm<LoginPayLoad>({
+  const { control, handleSubmit } = useForm<RegisterPayload>({
     defaultValues: {
+      firstName: '',
+      lastName: '',
       email: '',
       password: ''
     },
     resolver: yupResolver(schema)
   })
 
-  const handleFormSubmit = (values: LoginPayLoad) => {
-    const payload = { ...values }
-    onSubmit?.(payload)
+  const handleFormSubmit = (values: RegisterPayload) => {
+    onSubmit?.(values)
   }
 
   return (
-    <Box
-      component='form'
-      sx={{ mt: 4 }}
-      onSubmit={handleSubmit(handleFormSubmit)}
-    >
+    <Box component='form' noValidate onSubmit={handleSubmit(handleFormSubmit)}>
       <InputField
+        name='firstName'
+        control={control}
+        label='Fist Name'
+        placeholder='Enter your first name...'
+        required
         disabled={loading}
+      />
+
+      <InputField
+        name='lastName'
+        control={control}
+        label='Last Name'
+        placeholder='Enter your last name...'
+        required
+        disabled={loading}
+      />
+
+      <InputField
         name='email'
         control={control}
         label='Email'
         placeholder='Enter your email...'
         required
+        disabled={loading}
       />
+
       <InputField
         disabled={loading}
         type={showPassword ? 'text' : 'password'}
@@ -88,7 +109,7 @@ const LoginForm = ({ loading = false, onSubmit }: LoginFormProps) => {
           size='large'
           loading={loading}
         >
-          Login
+          Register
         </Button>
         <Stack
           direction='row'
@@ -105,4 +126,4 @@ const LoginForm = ({ loading = false, onSubmit }: LoginFormProps) => {
   )
 }
 
-export default LoginForm
+export default RegisterForm
