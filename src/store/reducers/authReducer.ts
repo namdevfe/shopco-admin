@@ -20,10 +20,13 @@ const authSlice = createSlice({
       action: PayloadAction<{ accessToken: string; refreshToken: string }>
     ) {
       state.token = action.payload
+    },
+    logout(state) {
+      state.token = null
     }
   }
 })
 
 export const { actions, reducer: authReducer } = authSlice
-export const { setToken } = actions
+export const { setToken, logout } = actions
 export default authReducer
