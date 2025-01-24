@@ -1,8 +1,7 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
+import Account from '~/components/Account'
 import ModeSelect from '~/components/ModeSelect'
 
 const Header = () => {
@@ -17,23 +16,8 @@ const Header = () => {
         >
           <Box>Left</Box>
           <Stack direction='row' gap={2}>
-            {/* Mode Select */}
             <ModeSelect />
-
-            {/* Account */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              <Avatar alt='Avatar' sx={{ width: '32px', height: '32px' }}>
-                N
-              </Avatar>
-              <ArrowDropDownIcon />
-            </Box>
+            <Account />
           </Stack>
         </Stack>
       </Container>
