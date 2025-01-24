@@ -1,15 +1,20 @@
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
-import LoginForm from '~/pages/Auth/LoginPage/LoginForm'
-import { LoginPayLoad } from '~/types/auth'
 import { useState } from 'react'
-import authService from '~/services/authService'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import LoginForm from '~/pages/Auth/LoginPage/LoginForm'
+import authService from '~/services/authService'
+import { useAppDispatch } from '~/store'
+import { setToken } from '~/store/reducers/authReducer'
+import { LoginPayLoad } from '~/types/auth'
 
 const LoginPage = () => {
   const [loading, setLoading] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const handleLogin = async (payload: LoginPayLoad) => {
     setLoading(true)
@@ -19,6 +24,14 @@ const LoginPage = () => {
       if (res.statusCode === 200 && res.data) {
         // Notification
         toast.success(res.message)
+        dispatch(
+          setToken({
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken
+          })
+        )
+
+        navigate('/')
       }
     } catch (error) {
       console.log('🚀error---->', error)
