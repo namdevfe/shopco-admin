@@ -2,15 +2,18 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Button from '@mui/material/Button'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import RoleDialog from '~/pages/RolePage/RoleDialog'
-import { AddRolePayload } from '~/types/role'
+import { AddRolePayload, Role } from '~/types/role'
 import roleService from '~/services/roleService'
 import { toast } from 'react-toastify'
+import RoleTable from '~/pages/RolePage/RoleTable'
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isFetching, setIsFetching] = useState<boolean>(true)
+  const [roles, setRoles] = useState<Role[]>([])
 
   const handleShowDialog = () => {
     setIsShowDialog(true)
@@ -34,6 +37,26 @@ const RolePage = () => {
       setIsLoading(false)
     }
   }
+
+  const getRoles = useCallback(async () => {
+    setIsFetching(true)
+    try {
+      const res = await roleService.getRoles()
+      if (res.data.length > 0) {
+        setRoles(res.data)
+      }
+    } catch (error) {
+      console.log('🚀error---->', error)
+    } finally {
+      setTimeout(() => {
+        setIsFetching(false)
+      }, 300)
+    }
+  }, [])
+
+  useEffect(() => {
+    getRoles()
+  }, [getRoles])
 
   return (
     <>
@@ -65,6 +88,7 @@ const RolePage = () => {
           </Box>
 
           {/* Table */}
+          <RoleTable roles={roles} isLoading={isFetching} />
         </Container>
       </Box>
 
