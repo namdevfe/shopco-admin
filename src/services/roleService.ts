@@ -5,6 +5,9 @@ import axiosInstance from '~/utils/axiosInstance'
 const roleService = {
   addRole(payload: AddRolePayload): Promise<ApiResponse<Role>> {
     return axiosInstance.post('/roles/add-role', payload)
+  },
+  getRoles(): Promise<ApiResponse<Role[]>> {
+    return axiosInstance.get('/roles/get-roles')
   }
 }
 
