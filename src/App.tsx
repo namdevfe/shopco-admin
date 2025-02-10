@@ -5,6 +5,7 @@ import MainLayout from '~/layouts/MainLayout'
 import LoginPage from '~/pages/Auth/LoginPage'
 import RegisterPage from '~/pages/Auth/RegisterPage'
 import DashboardPage from '~/pages/DashboardPage'
+import RolePage from '~/pages/RolePage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path='/roles' element={<RolePage />} />
           </Route>
         </Route>
 
