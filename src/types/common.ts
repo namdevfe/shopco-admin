@@ -3,3 +3,16 @@ export interface ApiResponse<T> {
   message: string
   data: T
 }
+
+export type PaginationTypes = Partial<{
+  currentPage: number
+  total: number
+  totalPages: number
+  limit: number
+}>
+
+export interface ListParams {
+  page?: number
+  limit?: number
+  [key: string]: any
+}

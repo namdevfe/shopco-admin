@@ -8,7 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const SIDEBAR_MENUS = [
   {
@@ -25,7 +25,8 @@ const SIDEBAR_MENUS = [
 
 const Sidebar = () => {
   const navigate = useNavigate()
-  const [menuSelected, setMenuSelected] = useState<string>('/')
+  const { pathname } = useLocation()
+  const [menuSelected, setMenuSelected] = useState<string>(pathname)
 
   const handleMenuItemClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
