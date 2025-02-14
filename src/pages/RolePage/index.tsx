@@ -4,13 +4,18 @@ import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Pagination from '@mui/material/Pagination'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import RoleDialog from '~/pages/RolePage/RoleDialog'
 import RoleTable from '~/pages/RolePage/RoleTable'
 import roleService from '~/services/roleService'
 import { ListParams, PaginationTypes } from '~/types/common'
 import { Role } from '~/types/role'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
@@ -23,6 +28,15 @@ const RolePage = () => {
     limit: 3
   })
   const [selectedRole, setSelectedRole] = useState<Role>()
+  const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false)
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false)
+  }
+
+  const handleOpenConfirmDialog = () => {
+    setOpenConfirmDialog(true)
+  }
 
   const handleShowDialog = () => {
     setIsShowDialog(true)
@@ -39,6 +53,8 @@ const RolePage = () => {
       if (res.data._id) {
         toast.success(res.message)
         handleCloseDialog()
+        // handleGetRoles()
+        setFilters({ ...filters, page: 1 })
       }
     } catch (error) {
       console.log('🚀error---->', error)
@@ -79,25 +95,51 @@ const RolePage = () => {
     }
   }
 
-  useEffect(() => {
-    ;(async () => {
-      setIsFetching(true)
-      try {
-        const res = await roleService.getRoles(filters)
-        if (res.data.roles.length > 0) {
-          setRoles(res.data.roles)
+  const handleShowDeleteConfirmRole = (role: Role) => {
+    setSelectedRole(role)
+    handleOpenConfirmDialog()
+  }
 
-          if (res.data.pagination) {
-            setPagination(res.data.pagination)
-          }
+  const handleDeleteRole = async () => {
+    if (selectedRole?._id) {
+      setIsLoading(true)
+      try {
+        const res = await roleService.deleteRoleById(selectedRole._id)
+        if (res.data) {
+          toast.success(res.message)
+          handleCloseConfirmDialog()
+          setFilters({ ...filters, page: 1 })
+          // handleGetRoles()
         }
-      } catch (error) {
-        console.log('Fetch roles has error: ', error)
+      } catch (error: any) {
+        toast.error('Delete role is failed.', error)
       } finally {
-        setIsFetching(false)
+        setIsLoading(false)
       }
-    })()
+    }
+  }
+
+  const handleGetRoles = useCallback(async () => {
+    setIsFetching(true)
+    try {
+      const res = await roleService.getRoles(filters)
+      if (res.data.roles.length > 0) {
+        setRoles(res.data.roles)
+
+        if (res.data.pagination) {
+          setPagination(res.data.pagination)
+        }
+      }
+    } catch (error) {
+      console.log('Fetch roles has error: ', error)
+    } finally {
+      setIsFetching(false)
+    }
   }, [filters])
+
+  useEffect(() => {
+    handleGetRoles()
+  }, [handleGetRoles])
 
   return (
     <>
@@ -129,7 +171,11 @@ const RolePage = () => {
             </Button>
           </Box>
 
-          <RoleTable roles={roles} onEdit={handleSelectRole} />
+          <RoleTable
+            roles={roles}
+            onEdit={handleSelectRole}
+            onRemove={handleShowDeleteConfirmRole}
+          />
           <Box
             sx={{
               display: 'flex',
@@ -141,6 +187,7 @@ const RolePage = () => {
             <Pagination
               color='primary'
               count={pagination?.totalPages}
+              page={pagination?.currentPage || 1}
               onChange={handlePageChange}
             />
           </Box>
@@ -154,6 +201,31 @@ const RolePage = () => {
         onClose={handleCloseDialog}
         onSubmit={selectedRole ? handleEditRole : handleAddRole}
       />
+
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>Confirm delete role</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            Are you sure want delete this role?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog}>Disagree</Button>
+          <Button
+            onClick={() => {
+              handleDeleteRole()
+            }}
+            autoFocus
+          >
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

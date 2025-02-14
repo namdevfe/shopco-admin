@@ -26,6 +26,9 @@ const roleService = {
     payload: EditRolePayload
   ): Promise<ApiResponse<Role>> {
     return axiosInstance.put(`/roles/edit-role/${id}`, payload)
+  },
+  deleteRoleById(id: string): Promise<ApiResponse<Role>> {
+    return axiosInstance.delete(`/roles/delete-role/${id}`)
   }
 }
 
