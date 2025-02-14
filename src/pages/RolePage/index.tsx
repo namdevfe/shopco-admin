@@ -9,8 +9,8 @@ import { toast } from 'react-toastify'
 import RoleDialog from '~/pages/RolePage/RoleDialog'
 import RoleTable from '~/pages/RolePage/RoleTable'
 import roleService from '~/services/roleService'
-import { PaginationTypes } from '~/types/common'
-import { AddRolePayload, Role } from '~/types/role'
+import { ListParams, PaginationTypes } from '~/types/common'
+import { Role } from '~/types/role'
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
@@ -18,10 +18,11 @@ const RolePage = () => {
   const [, setIsFetching] = useState<boolean>(true)
   const [roles, setRoles] = useState<Role[]>([])
   const [pagination, setPagination] = useState<PaginationTypes | null>(null)
-  const [filters, setFilters] = useState<any>({
+  const [filters, setFilters] = useState<ListParams>({
     page: 1,
     limit: 3
   })
+  const [selectedRole, setSelectedRole] = useState<Role>()
 
   const handleShowDialog = () => {
     setIsShowDialog(true)
@@ -31,7 +32,7 @@ const RolePage = () => {
     setIsShowDialog(false)
   }
 
-  const handleAddRole = async (payload: AddRolePayload) => {
+  const handleAddRole = async (payload: any) => {
     setIsLoading(true)
     try {
       const res = await roleService.addRole(payload)
@@ -51,6 +52,33 @@ const RolePage = () => {
     setFilters({ ...filters, page })
   }
 
+  const handleSelectRole = (role: Role) => {
+    handleShowDialog()
+    setSelectedRole(role)
+  }
+
+  const handleEditRole = async (payload: any) => {
+    if (selectedRole?._id) {
+      setIsLoading(true)
+      try {
+        const res = await roleService.editRoleById(selectedRole._id, payload)
+        if (res.data) {
+          toast.success(res.message)
+          const { _id, name, description, permission } = res.data || {}
+          const index = roles.findIndex((role) => role._id === _id)
+          roles[index].name = name
+          roles[index].description = description
+          roles[index].permission = permission
+          handleCloseDialog()
+        }
+      } catch (error) {
+        console.log('🚀fetch role has error---->', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
   useEffect(() => {
     ;(async () => {
       setIsFetching(true)
@@ -66,9 +94,7 @@ const RolePage = () => {
       } catch (error) {
         console.log('Fetch roles has error: ', error)
       } finally {
-        setTimeout(() => {
-          setIsFetching(false)
-        }, 300)
+        setIsFetching(false)
       }
     })()
   }, [filters])
@@ -103,7 +129,7 @@ const RolePage = () => {
             </Button>
           </Box>
 
-          <RoleTable roles={roles} />
+          <RoleTable roles={roles} onEdit={handleSelectRole} />
           <Box
             sx={{
               display: 'flex',
@@ -124,8 +150,9 @@ const RolePage = () => {
       <RoleDialog
         isOpen={isShowDialog}
         isLoading={isLoading}
+        role={selectedRole}
         onClose={handleCloseDialog}
-        onSubmit={handleAddRole}
+        onSubmit={selectedRole ? handleEditRole : handleAddRole}
       />
     </>
   )

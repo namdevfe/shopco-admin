@@ -5,22 +5,24 @@ import InputField from '~/components/InputField'
 import Box from '@mui/material/Box'
 import { useForm } from 'react-hook-form'
 import Button from '@mui/material/Button'
-import { AddRolePayload } from '~/types/role'
+import { Role } from '~/types/role'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import CircularProgress from '@mui/material/CircularProgress'
+import { useEffect } from 'react'
 
 interface RoleDialogProps {
   isOpen?: boolean
   isLoading?: boolean
+  role?: Role
   onClose?: () => void
-  // eslint-disable-next-line no-unused-vars
-  onSubmit?: (payload: AddRolePayload) => void
+  onSubmit?: (payload: any) => void
 }
 
 const RoleDialog = ({
   isOpen = false,
   isLoading = false,
+  role,
   onClose,
   onSubmit
 }: RoleDialogProps) => {
@@ -37,15 +39,24 @@ const RoleDialog = ({
     resolver: yupResolver(schema)
   })
 
-  const _onSubmit = (data: AddRolePayload) => {
+  const _onSubmit = (data: any) => {
     onSubmit?.(data)
     reset()
   }
 
+  useEffect(() => {
+    if (role) {
+      reset({
+        name: role.name,
+        description: role.description
+      })
+    }
+  }, [role, reset])
+
   return (
     <Dialog fullWidth open={isOpen} onClose={onClose}>
       {isLoading && <CircularProgress />}
-      <DialogTitle>Add new role</DialogTitle>
+      <DialogTitle>{role ? 'Edit role' : 'Add new role'}</DialogTitle>
       <DialogContent>
         <Box component='form' onSubmit={handleSubmit(_onSubmit)}>
           <InputField name='name' label='Name' control={control} />
@@ -56,7 +67,7 @@ const RoleDialog = ({
           />
 
           <Button type='submit' variant='contained'>
-            Add
+            {role ? 'Edit' : 'Add'}
           </Button>
         </Box>
       </DialogContent>
