@@ -12,3 +12,7 @@ export interface AddRolePayload {
   name: string
   description?: string
 }
+
+export type EditRolePayload = Partial<
+  Pick<Role, 'name' | 'description' | 'permission'>
+>

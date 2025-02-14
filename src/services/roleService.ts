@@ -1,5 +1,5 @@
 import { ApiResponse, ListParams } from '~/types/common'
-import { AddRolePayload, Role } from '~/types/role'
+import { AddRolePayload, Role, EditRolePayload } from '~/types/role'
 import axiosInstance from '~/utils/axiosInstance'
 
 const roleService = {
@@ -20,6 +20,12 @@ const roleService = {
     return axiosInstance.get('/roles/get-roles', {
       params
     })
+  },
+  editRoleById(
+    id: string,
+    payload: EditRolePayload
+  ): Promise<ApiResponse<Role>> {
+    return axiosInstance.put(`/roles/edit-role/${id}`, payload)
   }
 }
 
