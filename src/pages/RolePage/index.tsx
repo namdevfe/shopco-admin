@@ -16,6 +16,11 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { SORT_OPTIONS } from '~/constants/general'
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
@@ -25,10 +30,19 @@ const RolePage = () => {
   const [pagination, setPagination] = useState<PaginationTypes | null>(null)
   const [filters, setFilters] = useState<ListParams>({
     page: 1,
-    limit: 3
+    limit: 3,
+    sort: 'desc',
+    sortBy: 'createdAt'
   })
   const [selectedRole, setSelectedRole] = useState<Role>()
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false)
+
+  const handleSortChange = (e: SelectChangeEvent) => {
+    const sortObject = SORT_OPTIONS.find(
+      (item) => item.value === e.target.value
+    )?.queryObject
+    setFilters({ ...filters, ...sortObject, page: 1 })
+  }
 
   const handleCloseConfirmDialog = () => {
     setOpenConfirmDialog(false)
@@ -169,6 +183,37 @@ const RolePage = () => {
             >
               Add new role
             </Button>
+          </Box>
+
+          {/* Actions */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              mb: 2
+            }}
+          >
+            {/* Sorting */}
+            <Box sx={{ minWidth: 266 }}>
+              <FormControl fullWidth>
+                <InputLabel id='select-sort-label'>Select sort</InputLabel>
+                <Select
+                  labelId='select-sort-label'
+                  id='select-sort-label'
+                  label='Select option'
+                  size='small'
+                  value={filters.sortBy}
+                  onChange={handleSortChange}
+                >
+                  {SORT_OPTIONS.map((item) => (
+                    <MenuItem key={item.value} value={item.value}>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
           </Box>
 
           <RoleTable

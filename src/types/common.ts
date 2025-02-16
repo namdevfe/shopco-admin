@@ -14,5 +14,7 @@ export type PaginationTypes = Partial<{
 export interface ListParams {
   page?: number
   limit?: number
+  sort?: string
+  sortBy?: string
   [key: string]: any
 }
