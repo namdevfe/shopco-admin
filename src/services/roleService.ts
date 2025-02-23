@@ -1,23 +1,15 @@
 import { ApiResponse, ListParams } from '~/types/common'
-import { AddRolePayload, Role, EditRolePayload } from '~/types/role'
+import { AddRolePayload, EditRolePayload, Role, Roles } from '~/types/role'
 import axiosInstance from '~/utils/axiosInstance'
 
 const roleService = {
   addRole(payload: AddRolePayload): Promise<ApiResponse<Role>> {
-    return axiosInstance.post('/roles/add-role', payload)
+    const url = '/roles/add-role'
+    return axiosInstance.post(url, payload)
   },
-  getRoles(params: ListParams): Promise<
-    ApiResponse<{
-      roles: Role[]
-      pagination: {
-        currentPage: number
-        limit: number
-        total: number
-        totalPages: number
-      }
-    }>
-  > {
-    return axiosInstance.get('/roles/get-roles', {
+  getRoles(params: ListParams): Promise<Roles> {
+    const url = '/roles/get-roles'
+    return axiosInstance.get(url, {
       params
     })
   },
@@ -25,10 +17,12 @@ const roleService = {
     id: string,
     payload: EditRolePayload
   ): Promise<ApiResponse<Role>> {
-    return axiosInstance.put(`/roles/edit-role/${id}`, payload)
+    const url = `/roles/edit-role/${id}`
+    return axiosInstance.put(url, payload)
   },
   deleteRoleById(id: string): Promise<ApiResponse<Role>> {
-    return axiosInstance.delete(`/roles/delete-role/${id}`)
+    const url = `/roles/delete-role/${id}`
+    return axiosInstance.delete(url)
   }
 }
 

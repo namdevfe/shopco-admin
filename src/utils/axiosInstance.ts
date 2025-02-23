@@ -5,7 +5,6 @@ import store from '~/store'
 const axiosInstance = axios.create({
   baseURL: BASE_URL_API_ENDPOINT,
   headers: {
-    Accept: 'application/json',
     'Content-Type': 'application/json'
   }
 })
