@@ -4,12 +4,12 @@ export interface ApiResponse<T> {
   data: T
 }
 
-export type PaginationTypes = Partial<{
+export interface ListPagination {
   currentPage: number
   total: number
   totalPages: number
   limit: number
-}>
+}
 
 export interface ListParams {
   page?: number

@@ -1,12 +1,19 @@
+import { ApiResponse, ListPagination } from '~/types/common'
+
 export interface Role {
   _id: string
   name: string
   description?: string
-  permission: string[] | []
+  permissions: string[]
   createdAt: Date
   updatedAt: Date
   _destroy: boolean
 }
+
+export type Roles = ApiResponse<{
+  roles: Role[]
+  pagination: ListPagination
+}>
 
 export interface AddRolePayload {
   name: string
@@ -14,5 +21,5 @@ export interface AddRolePayload {
 }
 
 export type EditRolePayload = Partial<
-  Pick<Role, 'name' | 'description' | 'permission'>
+  Pick<Role, 'name' | 'description' | 'permissions'>
 >

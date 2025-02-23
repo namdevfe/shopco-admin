@@ -2,32 +2,34 @@ import AddIcon from '@mui/icons-material/Add'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
-import Pagination from '@mui/material/Pagination'
-import Typography from '@mui/material/Typography'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
-import RoleDialog from '~/pages/RolePage/RoleDialog'
-import RoleTable from '~/pages/RolePage/RoleTable'
-import roleService from '~/services/roleService'
-import { ListParams, PaginationTypes } from '~/types/common'
-import { Role } from '~/types/role'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
-import FormControl from '@mui/material/FormControl'
+import Pagination from '@mui/material/Pagination'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Typography from '@mui/material/Typography'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import { SORT_OPTIONS } from '~/constants/general'
+import RoleDialog from '~/pages/RolePage/RoleDialog'
+import RoleTable from '~/pages/RolePage/RoleTable'
+import permissionService from '~/services/permissionService'
+import roleService from '~/services/roleService'
+import { ListPagination, ListParams } from '~/types/common'
+import { Permission } from '~/types/permission'
+import { Role } from '~/types/role'
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [, setIsFetching] = useState<boolean>(true)
   const [roles, setRoles] = useState<Role[]>([])
-  const [pagination, setPagination] = useState<PaginationTypes | null>(null)
+  const [pagination, setPagination] = useState<ListPagination | null>(null)
   const [filters, setFilters] = useState<ListParams>({
     page: 1,
     limit: 3,
@@ -36,6 +38,7 @@ const RolePage = () => {
   })
   const [selectedRole, setSelectedRole] = useState<Role>()
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false)
+  const [permissions, setPermissions] = useState<Permission[]>([])
 
   const handleSortChange = (e: SelectChangeEvent) => {
     const sortObject = SORT_OPTIONS.find(
@@ -58,6 +61,7 @@ const RolePage = () => {
 
   const handleCloseDialog = () => {
     setIsShowDialog(false)
+    setSelectedRole(undefined)
   }
 
   const handleAddRole = async (payload: any) => {
@@ -94,11 +98,11 @@ const RolePage = () => {
         const res = await roleService.editRoleById(selectedRole._id, payload)
         if (res.data) {
           toast.success(res.message)
-          const { _id, name, description, permission } = res.data || {}
+          const { _id, name, description, permissions } = res.data || {}
           const index = roles.findIndex((role) => role._id === _id)
           roles[index].name = name
           roles[index].description = description
-          roles[index].permission = permission
+          roles[index].permissions = permissions
           handleCloseDialog()
         }
       } catch (error) {
@@ -123,7 +127,6 @@ const RolePage = () => {
           toast.success(res.message)
           handleCloseConfirmDialog()
           setFilters({ ...filters, page: 1 })
-          // handleGetRoles()
         }
       } catch (error: any) {
         toast.error('Delete role is failed.', error)
@@ -154,6 +157,24 @@ const RolePage = () => {
   useEffect(() => {
     handleGetRoles()
   }, [handleGetRoles])
+
+  useEffect(() => {
+    if (isShowDialog) {
+      ;(async () => {
+        setIsFetching(true)
+        try {
+          const res = await permissionService.getAll()
+          if (res.data.length > 0) {
+            setPermissions(res.data)
+          }
+        } catch (error) {
+          console.log('🚀error---->', error)
+        } finally {
+          setIsFetching(false)
+        }
+      })()
+    }
+  }, [isShowDialog])
 
   return (
     <>
@@ -243,6 +264,7 @@ const RolePage = () => {
         isOpen={isShowDialog}
         isLoading={isLoading}
         role={selectedRole}
+        permissions={permissions}
         onClose={handleCloseDialog}
         onSubmit={selectedRole ? handleEditRole : handleAddRole}
       />
