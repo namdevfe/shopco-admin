@@ -1,9 +1,11 @@
 import Box from '@mui/material/Box'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAppSelector } from '~/store'
+import { selectToken } from '~/store/reducers/authReducer'
 
 const AuthLayout = () => {
-  const { token } = useAppSelector((state) => state.auth)
+  const token = useAppSelector(selectToken)
+
   if (token) {
     return <Navigate to='/' />
   }
@@ -15,7 +17,8 @@ const AuthLayout = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh'
+        height: '100vh',
+        backgroundColor: '#dedede'
       }}
     >
       <Outlet />

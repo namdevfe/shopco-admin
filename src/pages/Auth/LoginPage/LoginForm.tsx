@@ -38,8 +38,7 @@ const LoginForm = ({ loading = false, onSubmit }: LoginFormProps) => {
   })
 
   const handleFormSubmit = (values: LoginPayLoad) => {
-    const payload = { ...values }
-    onSubmit?.(payload)
+    onSubmit?.(values)
   }
 
   return (

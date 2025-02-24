@@ -18,3 +18,10 @@ export interface RegisterPayload {
 }
 
 export type RegisterResponse = User
+
+export type Profile = User & {
+  role: {
+    _id: string
+    name: string
+  }
+}

@@ -1,6 +1,7 @@
 import {
   LoginPayLoad,
   LoginResponse,
+  Profile,
   RegisterPayload,
   RegisterResponse
 } from '~/types/auth'
@@ -9,10 +10,16 @@ import axiosInstance from '~/utils/axiosInstance'
 
 const authService = {
   login(payload: LoginPayLoad): Promise<ApiResponse<LoginResponse>> {
-    return axiosInstance.post('/auth/login', payload)
+    const url = '/auth/login'
+    return axiosInstance.post(url, payload)
   },
   register(payload: RegisterPayload): Promise<ApiResponse<RegisterResponse>> {
-    return axiosInstance.post('/auth/register', payload)
+    const url = '/auth/register'
+    return axiosInstance.post(url, payload)
+  },
+  getProfile(): Promise<ApiResponse<Profile>> {
+    const url = '/auth/get-profile'
+    return axiosInstance.get(url)
   }
 }
 
