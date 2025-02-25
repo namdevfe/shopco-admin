@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const SIDEBAR_MENUS = [
@@ -60,8 +60,6 @@ const Sidebar = () => {
     })
   }
 
-  useEffect(() => {}, [])
-
   const DrawerList = (
     <Box sx={{ width: 250 }}>
       <Box>Logo</Box>
@@ -107,6 +105,7 @@ const Sidebar = () => {
                       disablePadding
                     >
                       <ListItemButton
+                        selected={childItem.path === menuSelected}
                         onClick={(e) => {
                           navigate(childItem.path)
                           handleMenuItemClick(e, childItem.path)
@@ -129,7 +128,7 @@ const Sidebar = () => {
   )
 
   return (
-    <Drawer variant='permanent' open={true}>
+    <Drawer variant='permanent' anchor='left'>
       {DrawerList}
     </Drawer>
   )

@@ -90,7 +90,20 @@ const RoleDialog = ({
   }, [role, reset])
 
   return (
-    <Dialog fullWidth open={isOpen} onClose={onClose}>
+    <Dialog
+      fullWidth
+      open={isOpen}
+      onClose={(_, reason) => {
+        if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+          reset({
+            name: '',
+            description: '',
+            permissions: []
+          })
+          onClose?.()
+        }
+      }}
+    >
       {isLoading && <CircularProgress />}
       <DialogTitle>{role ? 'Edit role' : 'Add new role'}</DialogTitle>
       <DialogContent>

@@ -1,8 +1,8 @@
-export const SORT_OPTIONS = [
+export const ROLE_SORT_OPTIONS = [
   {
     value: 'createdAt',
-    label: 'Created Newest',
-    queryObject: { sort: 'asc', sortBy: 'createdAt' }
+    label: 'Newest',
+    queryObject: { sort: 'desc', sortBy: 'createdAt' }
   },
   {
     value: 'updatedAt',

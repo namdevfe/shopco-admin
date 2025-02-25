@@ -1,4 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
+import FilterListIcon from '@mui/icons-material/FilterList'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
@@ -7,22 +8,36 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
+import Menu from '@mui/material/Menu'
 import Pagination from '@mui/material/Pagination'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { SelectChangeEvent } from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { SORT_OPTIONS } from '~/constants/general'
+import TableComponent, { ColumnProps } from '~/components/TableComponent'
+import { ROLE_SORT_OPTIONS } from '~/constants/general'
 import RoleDialog from '~/pages/RolePage/RoleDialog'
-import RoleTable from '~/pages/RolePage/RoleTable'
+import RoleFilters from '~/pages/RolePage/RoleFilters'
 import permissionService from '~/services/permissionService'
 import roleService from '~/services/roleService'
 import { ListPagination, ListParams } from '~/types/common'
 import { Permission } from '~/types/permission'
 import { Role } from '~/types/role'
+
+const ROLE_COLUMNS: ColumnProps[] = [
+  {
+    name: '_id',
+    label: 'ID'
+  },
+  {
+    name: 'name',
+    label: 'Name'
+  },
+  {
+    name: 'description',
+    label: 'Description'
+  }
+]
 
 const RolePage = () => {
   const [isShowDialog, setIsShowDialog] = useState<boolean>(false)
@@ -39,9 +54,18 @@ const RolePage = () => {
   const [selectedRole, setSelectedRole] = useState<Role>()
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false)
   const [permissions, setPermissions] = useState<Permission[]>([])
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
+
+  const handleFiltersOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleFiltersClose = () => {
+    setAnchorEl(null)
+  }
 
   const handleSortChange = (e: SelectChangeEvent) => {
-    const sortObject = SORT_OPTIONS.find(
+    const sortObject = ROLE_SORT_OPTIONS.find(
       (item) => item.value === e.target.value
     )?.queryObject
     setFilters({ ...filters, ...sortObject, page: 1 })
@@ -60,8 +84,8 @@ const RolePage = () => {
   }
 
   const handleCloseDialog = () => {
-    setIsShowDialog(false)
     setSelectedRole(undefined)
+    setIsShowDialog(false)
   }
 
   const handleAddRole = async (payload: any) => {
@@ -189,7 +213,7 @@ const RolePage = () => {
             }}
           >
             <Box>
-              <Typography variant='h4' gutterBottom>
+              <Typography variant='h4' component='h1' gutterBottom>
                 Roles
               </Typography>
               <Typography variant='body2' color='textSecondary'>
@@ -215,33 +239,60 @@ const RolePage = () => {
               mb: 2
             }}
           >
-            {/* Sorting */}
-            <Box sx={{ minWidth: 266 }}>
-              <FormControl fullWidth>
-                <InputLabel id='select-sort-label'>Select sort</InputLabel>
-                <Select
-                  labelId='select-sort-label'
-                  id='select-sort-label'
-                  label='Select option'
-                  size='small'
-                  value={filters.sortBy}
-                  onChange={handleSortChange}
-                >
-                  {SORT_OPTIONS.map((item) => (
-                    <MenuItem key={item.value} value={item.value}>
-                      {item.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            {/* Filters */}
+            <Box>
+              <Button
+                variant='outlined'
+                startIcon={<FilterListIcon />}
+                onClick={handleFiltersOpen}
+              >
+                Filters
+              </Button>
+              <Menu
+                id='basic-menu'
+                sx={{
+                  '.MuiPaper-root': {
+                    minWidth: 300
+                  }
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleFiltersClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button'
+                }}
+              >
+                <RoleFilters filters={filters} onChange={handleSortChange} />
+                {/* <MenuItem>
+                  <FormControl fullWidth>
+                    <InputLabel id='select-sort-label'>Select sort</InputLabel>
+                    <Select
+                      labelId='select-sort-label'
+                      id='select-sort-label'
+                      label='Select option'
+                      size='small'
+                      value={filters.sortBy}
+                      onChange={handleSortChange}
+                    >
+                      {SORT_OPTIONS.map((item) => (
+                        <MenuItem key={item.value} value={item.value}>
+                          {item.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </MenuItem> */}
+              </Menu>
             </Box>
           </Box>
 
-          <RoleTable
-            roles={roles}
+          <TableComponent
+            columns={ROLE_COLUMNS}
+            data={roles}
             onEdit={handleSelectRole}
             onRemove={handleShowDeleteConfirmRole}
           />
+
           <Box
             sx={{
               display: 'flex',
