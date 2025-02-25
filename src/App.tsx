@@ -15,7 +15,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<MainLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route path='/roles' element={<RolePage />} />
+            <Route path='/setting/roles' element={<RolePage />} />
           </Route>
         </Route>
 
