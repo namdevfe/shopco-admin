@@ -7,7 +7,9 @@ import AddIcon from '@mui/icons-material/Add'
 import TableComponent, { ColumnProps } from '~/components/TableComponent'
 import { useEffect, useState } from 'react'
 import permissionService from '~/services/permissionService'
-import { Permission } from '~/types/permission'
+import { AddPermissionPayload, Permission } from '~/types/permission'
+import PermissionDialog from '~/pages/PermissionPage/PermissionDialog'
+import { toast } from 'react-toastify'
 
 const PERMISSION_COLUMNS: ColumnProps[] = [
   {
@@ -25,8 +27,48 @@ const PERMISSION_COLUMNS: ColumnProps[] = [
 ]
 
 const PermissionPage = () => {
+  // Init hooks
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [isShowPermissionDialog, setIsShowPermissionDialog] =
+    useState<boolean>(false)
+
+  // Events handling
+  // Handle open permission dialog if user click button Add
+  const handleOpenPermissionDialog = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsShowPermissionDialog(true)
+  }
+
+  const handleClosePermissionDialog = () => {
+    setIsShowPermissionDialog(false)
+  }
+
+  // Handle add new permission
+  const handleAddPermission = async (payload: AddPermissionPayload) => {
+    try {
+      const res = await permissionService.add(payload)
+      if (res?.data?._id) {
+        // Toast notification success
+        toast.success(res?.message)
+
+        // Push to permissions
+        setPermissions((prev) => [res.data, ...prev])
+      }
+    } catch (error: any) {
+      const errorInfo = error?.response?.data
+      toast.error(errorInfo?.message)
+    }
+  }
+
+  // Handle submit
+  const handleSubmit = (data: AddPermissionPayload) => {
+    const payload = { ...data }
+    handleAddPermission(payload)
+  }
 
   useEffect(() => {
     const handleGetPermissions = async () => {
@@ -50,36 +92,45 @@ const PermissionPage = () => {
   }, [])
 
   return (
-    <Container>
-      <Stack
-        direction='row'
-        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
-      >
-        <Box>
-          <Typography variant='h4' component='h1' gutterBottom>
-            Permissions
-          </Typography>
-          <Typography variant='body2' color='textSecondary'>
-            Create permission to assign for role...
-          </Typography>
-        </Box>
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={() => {}}
-          startIcon={<AddIcon />}
+    <>
+      <Container>
+        <Stack
+          direction='row'
+          sx={{ alignItems: 'center', justifyContent: 'space-between' }}
         >
-          Add new permission
-        </Button>
-      </Stack>
+          <Box>
+            <Typography variant='h4' component='h1' gutterBottom>
+              Permissions
+            </Typography>
+            <Typography variant='body2' color='textSecondary'>
+              Create permission to assign for role...
+            </Typography>
+          </Box>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={handleOpenPermissionDialog}
+            startIcon={<AddIcon />}
+          >
+            Add new permission
+          </Button>
+        </Stack>
 
-      <TableComponent
-        sx={{ marginTop: 4 }}
-        loading={loading}
-        columns={PERMISSION_COLUMNS}
-        data={permissions || []}
+        <TableComponent
+          sx={{ marginTop: 4 }}
+          loading={loading}
+          columns={PERMISSION_COLUMNS}
+          data={permissions || []}
+        />
+      </Container>
+
+      {/* Permission Dialog */}
+      <PermissionDialog
+        isOpen={isShowPermissionDialog}
+        onSubmit={handleSubmit}
+        onClose={handleClosePermissionDialog}
       />
-    </Container>
+    </>
   )
 }
 

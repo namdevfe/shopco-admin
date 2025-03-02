@@ -1,9 +1,11 @@
 export interface Permission {
   _id: string
   url: string
-  description: string
+  description?: string
   _destroy: boolean
   createdAt: Date
   updatedAt: Date
   __v: number
 }
+
+export type AddPermissionPayload = Pick<Permission, 'url' | 'description'>
