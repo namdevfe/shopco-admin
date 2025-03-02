@@ -27,6 +27,11 @@ const SIDEBAR_MENUS = [
         text: 'Roles',
         icon: <></>,
         path: '/setting/roles'
+      },
+      {
+        text: 'Permissions',
+        icon: <></>,
+        path: '/setting/permissions'
       }
     ]
   }

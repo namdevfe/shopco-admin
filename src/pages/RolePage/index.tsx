@@ -60,6 +60,7 @@ const RolePage = () => {
   const handleFiltersOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
+
   const handleFiltersClose = () => {
     setAnchorEl(null)
   }

@@ -5,6 +5,7 @@ import MainLayout from '~/layouts/MainLayout'
 import LoginPage from '~/pages/Auth/LoginPage'
 import RegisterPage from '~/pages/Auth/RegisterPage'
 import DashboardPage from '~/pages/DashboardPage'
+import PermissionPage from '~/pages/PermissionPage'
 import RolePage from '~/pages/RolePage'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path='/' element={<MainLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path='/setting/roles' element={<RolePage />} />
+            <Route path='/setting/permissions' element={<PermissionPage />} />
           </Route>
         </Route>
 
